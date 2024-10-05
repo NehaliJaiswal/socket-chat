@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Chat Application</title>
+    <style>
+        #chat {
+            height: 300px;
+            border: 1px solid #000;
+            overflow-y: scroll;
+            margin-bottom: 10px;
+        }
+
+        #message {
+            width: 80%;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Chat Room</h1>
+    <div id="chat"></div>
+
+    <input id="message" type="text" placeholder="Enter message" />
+    <button id="send">Send</button>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        // Create a connection to the server
+        const socket = io();
+
+        // Get the DOM elements for the chat and input fields
+        const chat = document.getElementById("chat");
+        const message = document.getElementById("message");
+        const sendButton = document.getElementById("send");
+
+        // Send message to server when "Send" button is clicked
+        sendButton.onclick = () => {
+            if (message.value.trim() !== "") {
+                socket.emit("chat message", message.value);  // Emit 'chat message' event to the server
+                message.value = "";  // Clear the input field after sending
+            }
+        };
+
+        // Listen for 'chat message' events from the server and add them to the chat
+        socket.on("chat message", (msg) => {
+            const messageElement = document.createElement("p");
+            messageElement.textContent = msg;  // Set the received message as text
+            chat.appendChild(messageElement);  // Add the message to the chat window
+            chat.scrollTop = chat.scrollHeight;  // Automatically scroll to the bottom
+        });
+    </script>
+</body>
+
+</html>
